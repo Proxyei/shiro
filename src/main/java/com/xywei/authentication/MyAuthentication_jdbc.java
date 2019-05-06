@@ -34,9 +34,10 @@ public class MyAuthentication_jdbc {
 	public void testMyAuthenticationJDBCRealm() {
 
 		String username = "admin";
-		String password = "admin1";
+		String password = "admin";
 
 		jdbcRealm.setDataSource(dataSource);
+		jdbcRealm.setPermissionsLookupEnabled(true);
 		DefaultSecurityManager securityManager = new DefaultSecurityManager();
 		securityManager.setRealm(jdbcRealm);
 
@@ -48,6 +49,13 @@ public class MyAuthentication_jdbc {
 		try {
 			subject.login(token);
 			System.out.println("登录认证：" + subject.isAuthenticated());
+			// 授权测试
+			// 基于资源 注意：需要开启资源授权
+			subject.checkPermission("admin:select");
+			System.out.println("基于资源授权：" + subject.isPermitted("admin:select"));
+			// 基于角色
+			subject.checkRole("admin");
+			System.out.println("基于角色授权：" + subject.hasRole("admin"));
 			subject.logout();
 			System.out.println("登出后认证：" + subject.isAuthenticated());
 		} catch (AuthenticationException e) {
