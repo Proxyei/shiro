@@ -45,7 +45,7 @@ public class MyAuthentication_ini {
 
 		// 方法二：
 //		 DefaultSecurityManager securityManager2 = new DefaultSecurityManager();
-		// 方法三：使用simpleAccountRealm直接adduser
+		// 方法三：使用simpleAccountRealm直接adduser 但是不支持添加权限，还是ini比较强大
 //		SimpleAccountRealm iniRealm=new SimpleAccountRealm();
 //		iniRealm.addAccount(username, password);
 		// IniRealm iniRealm = new IniRealm(resourcePath);
