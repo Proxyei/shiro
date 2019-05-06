@@ -3,11 +3,17 @@ package com.xywei.authentication;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.config.IniSecurityManagerFactory;
+import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.realm.text.IniRealm;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.Factory;
 import org.junit.Test;
+
+import com.xywei.realm.MyCustomRealm;
+import com.xywei.realm.MyCustomRealmMD5;
 
 /**
  * 使用ini文件进行的认证
@@ -28,16 +34,24 @@ public class MyAuthentication_ini {
 	 */
 	@Test
 	public void testAuthenticationIni() {
+		
+		String resourcePath = "classpath:authentication/first_ini.ini";
 
 		// 加载realm
-		Factory<SecurityManager> securityManagerFactory = new IniSecurityManagerFactory(
-				"classpath:authentication/first_ini.ini");
+		Factory<SecurityManager> securityManagerFactory = new IniSecurityManagerFactory(resourcePath);
 		// 获取securityManager
 		SecurityManager securityManager = securityManagerFactory.getInstance();
+
+		// 方法二：
+//		DefaultSecurityManager securityManager2 = new DefaultSecurityManager();
+//		IniRealm iniRealm = new IniRealm(resourcePath);
+//		securityManager2.setRealm(iniRealm);
+
 		// 第一次练习，第一步,到这里卡住了，不知道如何写下去
 		// 设置运行环境
 		// 设置使用的subjectmanager
 		SecurityUtils.setSecurityManager(securityManager);
+//		SecurityUtils.setSecurityManager(securityManager2);
 		// 获取主体
 		Subject subject = SecurityUtils.getSubject();
 
@@ -68,6 +82,12 @@ public class MyAuthentication_ini {
 		Factory<SecurityManager> securityManagerFactory = new IniSecurityManagerFactory(iniResourcePath);
 		SecurityManager securityManager = securityManagerFactory.getInstance();
 		SecurityUtils.setSecurityManager(securityManager);
+		//方法二
+//		MyCustomRealm myCustomRealm=new MyCustomRealm();
+//		DefaultSecurityManager securityManager=new DefaultSecurityManager();
+//		securityManager.setRealm(myCustomRealm);
+//		SecurityUtils.setSecurityManager(securityManager);
+		
 		Subject subject = SecurityUtils.getSubject();
 		// 自定义realm需要这句不？
 		UsernamePasswordToken token = new UsernamePasswordToken(username, password);
@@ -92,11 +112,20 @@ public class MyAuthentication_ini {
 	@Test
 	public void authenticationTestMD5() {
 
-		String iniResourcePath = "classpath:authentication/custom_realm_md5.ini";
-		Factory<SecurityManager> factory = new IniSecurityManagerFactory(iniResourcePath);
-		SecurityManager securityManager = factory.getInstance();
-		SecurityUtils.setSecurityManager(securityManager);
+//		String iniResourcePath = "classpath:authentication/custom_realm_md5.ini";
+//		Factory<SecurityManager> factory = new IniSecurityManagerFactory(iniResourcePath);
+//		SecurityManager securityManager = factory.getInstance();
+//		SecurityUtils.setSecurityManager(securityManager);
 
+		//方法二
+		HashedCredentialsMatcher matcher=new HashedCredentialsMatcher();
+		matcher.setHashAlgorithmName("md5");
+		matcher.setHashIterations(10);
+		MyCustomRealmMD5 myCustomRealmMD5=new MyCustomRealmMD5();
+		myCustomRealmMD5.setCredentialsMatcher(matcher);
+		DefaultSecurityManager securityManager=new DefaultSecurityManager();
+		securityManager.setRealm(myCustomRealmMD5);
+		SecurityUtils.setSecurityManager(securityManager);
 		Subject subject = SecurityUtils.getSubject();
 
 		UsernamePasswordToken token = new UsernamePasswordToken(username, password);
